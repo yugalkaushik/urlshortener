@@ -1,4 +1,5 @@
 import { UrlModel, IUrl } from "../models/url.model";
+import { connectDB } from "../config/db";
 import { generateShortCode } from "../utils/generateCode";
 import { isValidUrl } from "../utils/validateUrl";
 import { ENV } from "../config/env";
@@ -17,6 +18,8 @@ interface CreateUrlResult {
 }
 
 export async function createShortUrl(options: CreateUrlOptions): Promise<CreateUrlResult> {
+  await connectDB();
+
   const { originalUrl, customCode, ttlSeconds } = options;
 
   if (!isValidUrl(originalUrl)) {
@@ -51,6 +54,8 @@ export async function createShortUrl(options: CreateUrlOptions): Promise<CreateU
 }
 
 export async function resolveShortUrl(shortCode: string): Promise<IUrl> {
+  await connectDB();
+
   const urlDoc = await UrlModel.findOne({ shortCode, isActive: true });
 
   if (!urlDoc) throw new Error("NOT_FOUND");
@@ -65,6 +70,8 @@ export async function resolveShortUrl(shortCode: string): Promise<IUrl> {
 }
 
 export async function deactivateUrl(shortCode: string): Promise<void> {
+  await connectDB();
+
   const result = await UrlModel.updateOne({ shortCode }, { isActive: false });
   if (result.matchedCount === 0) throw new Error("NOT_FOUND");
 }

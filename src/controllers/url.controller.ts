@@ -4,6 +4,7 @@ import { getAnalytics, recordClick } from "../services/analytics.service";
 
 export async function shortenUrl(req: Request, res: Response, next: NextFunction) {
   try {
+    console.log('shortenUrl called');
     const { url, customCode, ttlSeconds } = req.body;
 
     if (!url || typeof url !== "string") {
@@ -16,6 +17,7 @@ export async function shortenUrl(req: Request, res: Response, next: NextFunction
       customCode: customCode?.trim(),
       ttlSeconds: ttlSeconds ? parseInt(ttlSeconds, 10) : undefined,
     });
+    console.log('createShortUrl returned');
 
     res.status(201).json({ success: true, data: result });
   } catch (err) {

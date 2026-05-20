@@ -8,6 +8,7 @@ const url_service_1 = require("../services/url.service");
 const analytics_service_1 = require("../services/analytics.service");
 async function shortenUrl(req, res, next) {
     try {
+        console.log('shortenUrl called');
         const { url, customCode, ttlSeconds } = req.body;
         if (!url || typeof url !== "string") {
             res.status(400).json({ success: false, error: "url is required." });
@@ -18,6 +19,7 @@ async function shortenUrl(req, res, next) {
             customCode: customCode?.trim(),
             ttlSeconds: ttlSeconds ? parseInt(ttlSeconds, 10) : undefined,
         });
+        console.log('createShortUrl returned');
         res.status(201).json({ success: true, data: result });
     }
     catch (err) {

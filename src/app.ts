@@ -18,7 +18,7 @@ app.use(
         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:'],
         connectSrc: ["'self'", 'https:'],
-        fontSrc: ["'self'", 'https:', '*.vercel-storage.com'],
+        fontSrc: ["'self'", 'https:'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
       },

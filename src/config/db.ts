@@ -17,7 +17,11 @@ export async function connectDB(): Promise<void> {
 
   if (!global.mongooseConnection.promise) {
     global.mongooseConnection.promise = mongoose
-      .connect(ENV.MONGO_URI)
+      .connect(ENV.MONGO_URI, {
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 30000,
+      })
       .then((m) => {
         global.mongooseConnection!.conn = mongoose;
         return mongoose;

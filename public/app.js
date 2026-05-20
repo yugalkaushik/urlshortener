@@ -13,6 +13,8 @@ const analyticsSummary = document.getElementById("analytics-summary");
 const prefillDemoButton = document.getElementById("prefill-demo");
 const analyticsCodeInput = document.getElementById("analytics-code");
 
+const REQUEST_TIMEOUT_MS = 15000;
+
 let latestShortUrl = "";
 
 function setMessage(message, kind) {
@@ -125,6 +127,8 @@ async function handleShortenSubmit(event) {
   const originalUrl = document.getElementById("original-url").value.trim();
   const ttlMinutes = document.getElementById("ttl-minutes").value.trim();
   const ttlSeconds = ttlMinutes ? Number(ttlMinutes) * 60 : undefined;
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
     const response = await fetch("/api/shorten", {
@@ -132,6 +136,7 @@ async function handleShortenSubmit(event) {
       headers: {
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         url: originalUrl,
         ttlSeconds: Number.isFinite(ttlSeconds) ? ttlSeconds : undefined,
@@ -147,7 +152,13 @@ async function handleShortenSubmit(event) {
     renderShortResult(data.data);
     setMessage("Link created successfully.", "success");
   } catch (error) {
-    setMessage(error instanceof Error ? error.message : "Unable to create link.", "error");
+    const isAbortError = error instanceof DOMException && error.name === "AbortError";
+    setMessage(
+      isAbortError ? "Request timed out. Please try again." : error instanceof Error ? error.message : "Unable to create link.",
+      "error"
+    );
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
 
